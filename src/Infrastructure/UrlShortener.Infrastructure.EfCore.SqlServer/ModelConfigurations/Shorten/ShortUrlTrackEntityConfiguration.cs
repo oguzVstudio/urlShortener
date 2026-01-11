@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using UrlShortener.Domain.Shorten.ShortenUrls;
-using UrlShortener.Infrastructure.EfCore.SqlServer.Context;
 
 namespace UrlShortener.Infrastructure.EfCore.SqlServer.ModelConfigurations.Shorten;
 
@@ -9,7 +8,13 @@ public class ShortUrlTrackEntityConfiguration : IEntityTypeConfiguration<Shorten
 {
     public void Configure(EntityTypeBuilder<ShortenUrlTrack> builder)
     {
-        builder.ToTable("ShortUrlTracks", ShortenSqlServerDbContext.DefaultSchema);
+         var prefix = !string.IsNullOrWhiteSpace(SqlServerDbSettings.TablePrefix)
+            ? $"{SqlServerDbSettings.TablePrefix}"
+            : string.Empty;
+        
+        var tableName = $"{prefix}ShortUrlTracks";
+        
+        builder.ToTable(tableName, SqlServerDbSettings.DefaultSchema);
         builder.Property(x => x.Id).ValueGeneratedNever();
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.Id).IsUnique();

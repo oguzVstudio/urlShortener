@@ -7,8 +7,6 @@ namespace UrlShortener.Infrastructure.EfCore.SqlServer.Context;
 
 public class ShortenSqlServerDbContext : DbContext, IShortenBaseDbContext, ISupportSaveChanges
 {
-    public const string DefaultSchema = "shorten";
-
     public ShortenSqlServerDbContext(DbContextOptions<ShortenSqlServerDbContext> options) : base(options)
     {
     }

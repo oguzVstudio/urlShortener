@@ -52,7 +52,11 @@ builder.Services.AddShortenMongoDb(builder.Configuration);     // MongoDB
 ```json
 {
   "PostgresOptions": {
-    "ConnectionString": "Server=localhost;Port=5432;Database=mydb;Username=user;Password=pass"
+    "ConnectionString": "Server=localhost;Port=5432;Database=mydb;Username=user;Password=pass",
+    "DefaultSchema": "shorten",
+    "TablePrefix": "",
+    "MigrationDefaultSchema": "public",
+    "MigrationAssembly": null
   }
 }
 ```
@@ -61,7 +65,11 @@ builder.Services.AddShortenMongoDb(builder.Configuration);     // MongoDB
 ```json
 {
   "SqlServerOptions": {
-    "ConnectionString": "Server=localhost;Database=mydb;User Id=sa;Password=pass;"
+    "ConnectionString": "Server=localhost;Database=mydb;User Id=sa;Password=pass;",
+    "DefaultSchema": "shorten",
+    "TablePrefix": "",
+    "MigrationDefaultSchema": "dbo",
+    "MigrationAssembly": null
   }
 }
 ```
@@ -102,6 +110,61 @@ await app.Services.ApplySqlServerDatabaseMigrationsAsync();
 
 ### MongoDB
 No migrations needed (schema-less).
+
+---
+
+## ⚙️ Configuration Options
+
+### PostgreSQL Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ConnectionString` | string | required | PostgreSQL connection string |
+| `DefaultSchema` | string | `"shorten"` | Default schema for tables |
+| `TablePrefix` | string | `""` | Prefix to add before table names (e.g., `"app"` → `app_shorten_urls`) |
+| `MigrationDefaultSchema` | string | `"public"` | Schema for migration history table |
+| `MigrationAssembly` | string | `null` | Assembly name for migrations (auto-detected if null) |
+| `UseInMemory` | bool | `false` | Use in-memory database for testing |
+
+**Example with table prefix:**
+```json
+{
+  "PostgresOptions": {
+    "ConnectionString": "Server=localhost;Port=5432;Database=mydb;Username=user;Password=pass",
+    "TablePrefix": "app"
+  }
+}
+```
+**Result:** Tables will be named `app_shorten_urls` and `app_short_url_tracks` in the `shorten` schema.
+
+### SQL Server Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ConnectionString` | string | required | SQL Server connection string |
+| `DefaultSchema` | string | `"shorten"` | Default schema for tables |
+| `TablePrefix` | string | `""` | Prefix to add before table names (e.g., `"App"` → `AppShortenUrls`) |
+| `MigrationDefaultSchema` | string | `"dbo"` | Schema for migration history table |
+| `MigrationAssembly` | string | `null` | Assembly name for migrations (auto-detected if null) |
+| `UseInMemory` | bool | `false` | Use in-memory database for testing |
+
+**Example with table prefix:**
+```json
+{
+  "SqlServerOptions": {
+    "ConnectionString": "Server=localhost;Database=mydb;User Id=sa;Password=pass;",
+    "TablePrefix": "App"
+  }
+}
+```
+**Result:** Tables will be named `AppShortenUrls` and `AppShortUrlTracks` in the `shorten` schema.
+
+### MongoDB Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ConnectionString` | string | required | MongoDB connection string |
+| `DatabaseName` | string | required | Database name |
 
 ---
 
