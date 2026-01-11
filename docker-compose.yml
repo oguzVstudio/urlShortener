@@ -1,0 +1,125 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: url-shortener-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: shorten
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: url-shortener-redis
+    command: redis-server --requirepass redis123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: url-shortener-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "SqlServer123!"
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P SqlServer123! -Q 'SELECT 1' -C || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-network
+
+  mongodb:
+    image: mongo:7
+    container_name: url-shortener-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: mongo123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: url-shortener-app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      # PostgreSQL Configuration (Default)
+      - PostgresOptions__ConnectionString=Server=postgres;Port=5432;Database=shorten;Username=postgres;Password=postgres123
+      - PostgresOptions__UseInMemory=false
+      # SQL Server Configuration (Uncomment to use SQL Server instead)
+      # - SqlServerOptions__ConnectionString=Server=sqlserver;Database=shorten;User Id=sa;Password=SqlServer123!;TrustServerCertificate=True
+      # - SqlServerOptions__UseInMemory=false
+      # MongoDB Configuration (Uncomment to use MongoDB instead)
+      # - MongoDbOptions__ConnectionString=mongodb://admin:mongo123@mongodb:27017
+      # - MongoDbOptions__DatabaseName=shorten
+      # Redis Configuration
+      - RedisOptions__Host=redis
+      - RedisOptions__Port=6379
+      - RedisOptions__Password=redis123
+      - ShortenUrlSettings__BaseUrl=http://localhost:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      # Uncomment for SQL Server
+      # sqlserver:
+      #   condition: service_healthy
+      # Uncomment for MongoDB
+      # mongodb:
+      #   condition: service_healthy
+    networks:
+      - url-shortener-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  sqlserver_data:
+    driver: local
+  mongodb_data:
+    driver: local
+
+networks:
+  url-shortener-network:
+    driver: bridge
