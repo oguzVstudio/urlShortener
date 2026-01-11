@@ -97,7 +97,7 @@ For detailed provider configuration, see [DATABASE_PROVIDER_GUIDE.md](DATABASE_P
 
    ```bash
    git clone <repository-url>
-   cd url_shortener_example
+   cd urlShortener
    ```
 2. **Start with Docker Compose**
 
@@ -144,7 +144,7 @@ docker-compose down -v
 
    ```bash
    git clone <repository-url>
-   cd url_shortener_example
+   cd urlShortener
    ```
 2. **Start required services**
 
@@ -715,6 +715,6 @@ If you find a bug or have a suggestion, please open an [issue](../../issues).
 ---
 
 **Developer:** [GitHub Profile](https://github.com/oguzVstudio)
-**Project Link:** [url_shortener_example](https://github.com/oguzVstudio/url_shortener_example)
+**Project Link:** [urlShortener](https://github.com/oguzVstudio/urlShortener)
 
 ⭐ Don't forget to star the project if you like it!
