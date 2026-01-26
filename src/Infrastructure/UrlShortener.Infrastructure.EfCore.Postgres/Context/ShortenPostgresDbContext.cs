@@ -1,7 +1,8 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using UrlShortener.Domain;
-using UrlShortener.Domain.Shorten.ShortenUrls;
+using UrlShortener.Domain.Shorten.Analytics;
+using UrlShortener.Domain.Shorten.ShortLinks;
 using UrlShortener.Infrastructure.EfCore.Postgres.Extensions;
 
 namespace UrlShortener.Infrastructure.EfCore.Postgres.Context;
@@ -20,7 +21,7 @@ public class ShortenPostgresDbContext : DbContext, IShortenBaseDbContext, ISuppo
         modelBuilder.ApplySnakeCaseNamingConvention();
     }
 
-    public DbSet<ShortenUrl> ShortenUrls => Set<ShortenUrl>();
+    public DbSet<ShortLink> ShortLinks => Set<ShortLink>();
 
-    public DbSet<ShortenUrlTrack> ShortenUrlTracks => Set<ShortenUrlTrack>();
+    public DbSet<ShortLinkAccessLog> ShortLinkAccessLogs => Set<ShortLinkAccessLog>();
 }

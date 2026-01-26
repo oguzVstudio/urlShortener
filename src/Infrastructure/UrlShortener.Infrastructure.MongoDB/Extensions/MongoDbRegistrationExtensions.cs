@@ -39,8 +39,8 @@ public static class MongoDbRegistrationExtensions
     
     public static IServiceCollection AddShortenMongoDbStores(this IServiceCollection services)
     {
-        services.AddScoped<IShortenUrlStore, ShortenUrlMongoStore>();
-        services.AddScoped<IShortenUrlTrackStore, ShortenUrlTrackMongoStore>();
+        services.AddScoped<IShortLinkStore, ShortLinkMongoStore>();
+        services.AddScoped<IShortLinkAccessLogStore, ShortLinkAccessLogMongoStore>();
 
         return services;
     }

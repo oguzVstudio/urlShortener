@@ -1,18 +1,18 @@
 ﻿using MassTransit;
-using UrlShortener.Domain.Shorten.ShortenUrls.Events;
+using UrlShortener.Domain.Shared.Events;
 
 namespace UrlShortener.Infrastructure.Masstransit.RabbitMq.Publishers;
 
-public static class ShortenedUrlTrackPublisher
+public static class ShortLinkAccessedEventPublisher
 {
-    public static void AddShortenedUrlTrackPublisher(this IRabbitMqBusFactoryConfigurator cfg)
+    public static void AddShortLinkAccessedEventPublisher(this IRabbitMqBusFactoryConfigurator cfg)
     {
-        cfg.Message<UrlTrackingEvent>(x =>
+        cfg.Message<ShortLinkAccessedEvent>(x =>
         {
-            x.SetEntityName("url_tracking_event.input_exchange");
+            x.SetEntityName("short_link_accessed_event.input_exchange");
         });
 
-        cfg.Publish<UrlTrackingEvent>(
+        cfg.Publish<ShortLinkAccessedEvent>(
             e => 
                 e.ExchangeType = RabbitMQ.Client.ExchangeType.Fanout);
     }

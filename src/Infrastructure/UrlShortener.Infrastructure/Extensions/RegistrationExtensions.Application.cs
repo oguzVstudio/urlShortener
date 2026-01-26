@@ -8,7 +8,7 @@ public static partial class RegistrationExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IShortenUrlAppService, ShortenUrlAppService>();
+        services.AddScoped<IShortLinkAppService, ShortLinkAppService>();
         return services;
     }
 }

@@ -1,10 +1,10 @@
 using MassTransit;
+using UrlShortener.Application.Services.Messaging;
 using UrlShortener.Domain.Extensions;
-using IBus = UrlShortener.Application.Shared.Bus.IBus;
 
 namespace UrlShortener.Infrastructure.Masstransit;
 
-public class MasstransitBus(IPublishEndpoint publishEndpoint) : IBus
+public class MasstransitBus(IPublishEndpoint publishEndpoint) : IMessageBus
 {
     public async Task PublishAsync<T>(T message,
         IDictionary<string, object?>? headers = null,

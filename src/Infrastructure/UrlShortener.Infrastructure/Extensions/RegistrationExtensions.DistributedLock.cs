@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using UrlShortener.Application.Shared.Cache;
+using UrlShortener.Application.Services.Caching;
 using UrlShortener.Infrastructure.Cache;
 
 namespace UrlShortener.Infrastructure.Extensions;

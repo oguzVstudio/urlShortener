@@ -22,15 +22,63 @@ namespace UrlShortener.Infrastructure.EfCore.Postgres.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("UrlShortener.Domain.Shorten.ShortenUrls.ShortenUrl", b =>
+            modelBuilder.Entity("UrlShortener.Domain.Shorten.Analytics.ShortLinkAccessLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("attempt_count");
+                    b.Property<DateTimeOffset>("AccessedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("accessed_at");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTimeOffset>("CreatedOnUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ip_address");
+
+                    b.Property<Guid>("ShortLinkId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("short_link_id");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("user_agent");
+
+                    b.HasKey("Id")
+                        .HasName("pk_short_link_access_logs");
+
+                    b.HasIndex("Code")
+                        .HasDatabaseName("ix_short_link_access_logs_code");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_short_link_access_logs_id");
+
+                    b.HasIndex("ShortLinkId")
+                        .HasDatabaseName("ix_short_link_access_logs_short_link_id");
+
+                    b.ToTable("short_link_access_logs", "shorten");
+                });
+
+            modelBuilder.Entity("UrlShortener.Domain.Shorten.ShortLinks.ShortLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -63,69 +111,17 @@ namespace UrlShortener.Infrastructure.EfCore.Postgres.Migrations
                         .HasColumnName("short_url");
 
                     b.HasKey("Id")
-                        .HasName("pk_shorten_urls");
+                        .HasName("pk_short_links");
 
                     b.HasIndex("Code")
                         .IsUnique()
-                        .HasDatabaseName("ix_shorten_urls_code");
+                        .HasDatabaseName("ix_short_links_code");
 
                     b.HasIndex("Id")
                         .IsUnique()
-                        .HasDatabaseName("ix_shorten_urls_id");
+                        .HasDatabaseName("ix_short_links_id");
 
-                    b.ToTable("shorten_urls", "shorten");
-                });
-
-            modelBuilder.Entity("UrlShortener.Domain.Shorten.ShortenUrls.ShortenUrlTrack", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("AccessedAt")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("accessed_at");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("code");
-
-                    b.Property<DateTimeOffset>("CreatedOnUtc")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("created_on_utc");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("ip_address");
-
-                    b.Property<Guid>("ShortenUrlId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("shorten_url_id");
-
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("user_agent");
-
-                    b.HasKey("Id")
-                        .HasName("pk_short_url_tracks");
-
-                    b.HasIndex("Code")
-                        .HasDatabaseName("ix_short_url_tracks_code");
-
-                    b.HasIndex("Id")
-                        .IsUnique()
-                        .HasDatabaseName("ix_short_url_tracks_id");
-
-                    b.HasIndex("ShortenUrlId")
-                        .HasDatabaseName("ix_short_url_tracks_shorten_url_id");
-
-                    b.ToTable("short_url_tracks", "shorten");
+                    b.ToTable("short_links", "shorten");
                 });
 #pragma warning restore 612, 618
         }

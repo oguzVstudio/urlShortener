@@ -92,7 +92,7 @@ services:
       - RedisOptions__Host=redis
       - RedisOptions__Port=6379
       - RedisOptions__Password=redis123
-      - ShortenUrlSettings__BaseUrl=http://localhost:8080
+      - ShortLinkSettings__BaseUrl=http://localhost:8080
     ports:
       - "8080:8080"
     depends_on:

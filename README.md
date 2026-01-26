@@ -56,6 +56,7 @@ The project follows Clean Architecture principles with layered separation:
 The project supports multiple database providers. Choose and register only what you need:
 
 **Program.cs:**
+
 ```csharp
 // Core infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -71,6 +72,7 @@ builder.Services.AddShortenPostgres(builder.Configuration);
 ```
 
 **appsettings.json:**
+
 ```json
 {
   "PostgresOptions": {
@@ -81,7 +83,7 @@ builder.Services.AddShortenPostgres(builder.Configuration);
     "Port": 6379,
     "Password": "redis123"
   },
-  "ShortenUrlSettings": {
+  "ShortLinkSettings": {
     "BaseUrl": "http://localhost:5028"
   }
 }
@@ -117,7 +119,7 @@ For detailed provider configuration, see [DATABASE_PROVIDER_GUIDE.md](DATABASE_P
    ```csharp
    // In Program.cs (for PostgreSQL)
    await app.Services.ApplyPostgresDatabaseMigrationsAsync();
-   
+
    // Or for SQL Server
    await app.Services.ApplySqlServerDatabaseMigrationsAsync();
    ```
@@ -162,7 +164,7 @@ docker-compose down -v
 3. **Apply migrations** (automatic on startup)
 
    Migrations are applied automatically when the application starts.
-   
+
    To manually apply migrations:
 
    ```bash
@@ -170,7 +172,7 @@ docker-compose down -v
    dotnet ef database update \
      --project src/Infrastructure/UrlShortener.Infrastructure.EfCore.Postgres \
      --startup-project src/Host/UrlShortener.Host
-   
+
    # SQL Server
    dotnet ef database update \
      --project src/Infrastructure/UrlShortener.Infrastructure.EfCore.SqlServer \
@@ -372,7 +374,7 @@ Fixed window rate limiting is applied to endpoints:
 
 ## 🗄️ Database Schema
 
-### Table: shorten_urls
+### Table: short_links
 
 Stores main URL information.
 
@@ -385,7 +387,6 @@ Stores main URL information.
 | `created_on_utc` | timestamp     | Creation timestamp          |
 | `is_expiring`    | boolean       | Has expiration date?        |
 | `expires_at`     | timestamp     | Expiration date (nullable)  |
-| `attempt_count`  | integer       | Access count                |
 
 **Indexes:**
 
@@ -393,19 +394,19 @@ Stores main URL information.
 - Unique index: `code`
 - Index: `expires_at` (WHERE is_expiring = true)
 
-### Table: short_url_tracks
+### Table: short_link_access_logs
 
 Stores URL access records.
 
-| Column             | Type         | Description                     |
-| ------------------ | ------------ | ------------------------------- |
-| `id`             | uuid         | Primary key                     |
-| `shorten_url_id` | uuid         | Foreign key → shorten_urls(id) |
-| `code`           | varchar(10)  | Short code (denormalized)       |
-| `ip_address`     | varchar(20)  | Client IP address               |
-| `user_agent`     | varchar(500) | Client user agent               |
-| `accessed_at`    | timestamp    | Access timestamp                |
-| `created_on_utc` | timestamp    | Record creation timestamp       |
+| Column             | Type         | Description                    |
+| ------------------ | ------------ | ------------------------------ |
+| `id`             | uuid         | Primary key                    |
+| `short_link_id`  | uuid         | Foreign key → short_links(id) |
+| `code`           | varchar(10)  | Short code (denormalized)      |
+| `ip_address`     | varchar(20)  | Client IP address              |
+| `user_agent`     | varchar(500) | Client user agent              |
+| `accessed_at`    | timestamp    | Access timestamp               |
+| `created_on_utc` | timestamp    | Record creation timestamp      |
 
 **Indexes:**
 
@@ -623,12 +624,12 @@ builder.Services.AddRabbitMqMasstransit(builder.Configuration);
 
 ## 🧪 Testing
 
-The project includes comprehensive test coverage across all layers with **39 tests**.
+The project includes comprehensive test coverage across all layers with **51 tests**.
 
 ### Test Projects
 
-- **UrlShortener.Domain.Tests** (16 tests) - Domain entities validation and behavior
-- **UrlShortener.Application.Tests** (8 tests) - Application services with full mocking
+- **UrlShortener.Domain.Tests** (17 tests) - Domain entities validation and behavior
+- **UrlShortener.Application.Tests** (19 tests) - Application services with full mocking
 - **UrlShortener.Infrastructure.Tests** (15 tests) - Store and Redis integration tests
 
 ### Quick Start - Running Tests Without Docker
@@ -636,17 +637,18 @@ The project includes comprehensive test coverage across all layers with **39 tes
 Most tests don't require Docker and can run immediately:
 
 ```bash
-# Run all unit tests (33 tests - no Docker needed)
+# Run all unit tests (45 tests - no Docker needed)
 dotnet test tests/UrlShortener.Domain.Tests/
 dotnet test tests/UrlShortener.Application.Tests/
-dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortenUrlStoreTests"
+dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortLinkStoreTests"
 ```
 
 **Test Results:**
-- ✅ Domain Tests: 16 passed
-- ✅ Application Tests: 8 passed
+
+- ✅ Domain Tests: 17 passed
+- ✅ Application Tests: 19 passed
 - ✅ Infrastructure Store Tests: 9 passed
-- **Total: 33 tests passing without Docker**
+- **Total: 45 tests passing without Docker**
 
 ### Running Full Test Suite (With Docker)
 
@@ -656,7 +658,7 @@ Some integration tests use TestContainers and require Docker:
 # Ensure Docker is running
 docker ps
 
-# Run all tests including integration tests (39 tests)
+# Run all tests including integration tests (51 tests)
 dotnet test
 
 # Run Docker-dependent tests only
@@ -667,8 +669,8 @@ dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedNam
 
 The test suite covers:
 
-- ✅ **Domain Entities** (16 tests) - Entity creation, validation, expiration, tracking
-- ✅ **Application Services** (8 tests) - Business logic, code collision, caching
+- ✅ **Domain Entities** (17 tests) - Entity creation, validation, expiration, IsExpired property, tracking
+- ✅ **Application Services** (19 tests) - Business logic, code collision, caching, retry logic, analytics
 - ✅ **Infrastructure Store** (9 tests) - PostgreSQL store with EF Core InMemory
 - ✅ **Redis/Distributed Locks** (6 tests) - Real Redis via TestContainers (requires Docker)
 

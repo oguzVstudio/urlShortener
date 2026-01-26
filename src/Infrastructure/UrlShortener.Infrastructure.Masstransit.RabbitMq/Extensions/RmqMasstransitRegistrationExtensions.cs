@@ -14,7 +14,7 @@ public static class RmqMasstransitRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration,
         Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> configureReceiveEndpoints = null,
-        Action<IBusRegistrationConfigurator> configureBusRegistration = null)
+        Action<IBusRegistrationConfigurator>? configureBusRegistration = null)
     {
         services.AddMassTransit(ConfiguratorAction);
 
@@ -66,11 +66,11 @@ public static class RmqMasstransitRegistrationExtensions
                 configuration,
                 (context, cfg) =>
                 {
-                    cfg.AddUrlTrackingConsumer(context);
+                    cfg.AddShortLinkAccessedEventConsumer(context);
 
-                    cfg.AddShortenedUrlTrackPublisher();
+                    cfg.AddShortLinkAccessedEventPublisher();
                 },
-                configureBusRegistration: x => { x.AddConsumer<UrlTrackingConsumer>(); });
+                configureBusRegistration: x => { x.AddConsumer<ShortLinkAccessedEventConsumer>(); });
 
         return services;
     }

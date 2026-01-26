@@ -60,8 +60,8 @@ public static class SqlServerRegistrationExtensions
 
     public static IServiceCollection AddShortenSqlServerStores(this IServiceCollection services)
     {
-        services.AddScoped<IShortenUrlStore, ShortenUrlSqlServerStore>();
-        services.AddScoped<IShortenUrlTrackStore, ShortenUrlTrackSqlServerStore>();
+        services.AddScoped<IShortLinkStore, ShortLinkSqlServerStore>();
+        services.AddScoped<IShortLinkAccessLogStore, ShortLinkAccessLogSqlServerStore>();
 
         return services;
     }

@@ -65,8 +65,8 @@ public static class PostgresRegistrationExtensions
 
     public static IServiceCollection AddShortenPostgresStores(this IServiceCollection services)
     {
-        services.AddScoped<IShortenUrlStore, ShortenUrlPostgresStore>();
-        services.AddScoped<IShortenUrlTrackStore, ShortenUrlTrackPostgresStore>();
+        services.AddScoped<IShortLinkStore, ShortLinkPostgresStore>();
+        services.AddScoped<IShortLinkAccessLogStore, ShortLinkAccessLogPostgresStore>();
 
         return services;
     }

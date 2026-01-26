@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Caching.Distributed;
-using UrlShortener.Application.Shared.Cache;
+using UrlShortener.Application.Services.Caching;
 
 namespace UrlShortener.Infrastructure.Cache;
 

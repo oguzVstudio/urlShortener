@@ -1,6 +1,6 @@
 using UrlShortener.Application.Features.Shorten.Services.v1;
-using UrlShortener.Application.Shared.Bus;
-using UrlShortener.Domain.Shorten.ShortenUrls.Events;
+using UrlShortener.Application.Services.Messaging;
+using UrlShortener.Domain.Shared.Events;
 
 namespace UrlShortener.Host.Features.Shorten.UrlRedirection;
 
@@ -18,19 +18,19 @@ public static class RedirectOriginalUrlEndpoint
     }
 
     private static async Task<IResult> HandleAsync(string code,
-        IShortenUrlAppService shortenUrlAppService,
+        IShortLinkAppService shortLinkAppService,
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        var shortenedUrl = await shortenUrlAppService.GetOriginalUrlAsync(code, cancellationToken);
+        var result = await shortLinkAppService.GetOriginalUrlAsync(code, cancellationToken);
 
-        if (!shortenedUrl.Found)
+        if (!result.Found)
         {
             return Results.NotFound();
         }
 
-        var bus = httpContext.RequestServices.GetRequiredService<IBus>();
-        await bus.PublishAsync(new UrlTrackingEvent
+        var bus = httpContext.RequestServices.GetRequiredService<IMessageBus>();
+        await bus.PublishAsync(new ShortLinkAccessedEvent
         {
             Code = code,
             IpAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
@@ -38,6 +38,6 @@ public static class RedirectOriginalUrlEndpoint
             AccessedAt = DateTimeOffset.UtcNow
         }, cancellationToken: cancellationToken);
 
-        return Results.Redirect(shortenedUrl.OriginalUrl!);
+        return Results.Redirect(result.OriginalUrl!);
     }
 }

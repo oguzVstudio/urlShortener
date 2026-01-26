@@ -1,9 +1,9 @@
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using UrlShortener.Infrastrßucture.Masstransit.InMemory.ConsumerEndpoints;
 using UrlShortener.Infrastructure.Masstransit.Consumers;
 using UrlShortener.Infrastructure.Masstransit.Extensions;
+using UrlShortener.Infrastructure.Masstransit.InMemory.ConsumerEndpoints;
 using UrlShortener.Infrastructure.Masstransit.InMemory.Publishers;
 
 namespace UrlShortener.Infrastructure.Masstransit.InMemory.Extensions;
@@ -14,7 +14,7 @@ public static class InMemoryMasstransitRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration,
         Action<IBusRegistrationContext, IInMemoryBusFactoryConfigurator> configureReceiveEndpoints = null,
-        Action<IBusRegistrationConfigurator> configureBusRegistration = null)
+        Action<IBusRegistrationConfigurator>? configureBusRegistration = null)
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -52,11 +52,11 @@ public static class InMemoryMasstransitRegistrationExtensions
             {
                 cfg.AddUrlTrackingConsumer(context);
 
-                cfg.AddShortenedUrlTrackPublisher();
+                cfg.AddShortLinkAccessedEventPublisher();
             },
             configureBusRegistration: x =>
             {
-                x.AddConsumer<UrlTrackingConsumer>();
+                x.AddConsumer<ShortLinkAccessedEventConsumer>();
             });
         
         return services;

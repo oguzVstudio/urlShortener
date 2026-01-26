@@ -2,8 +2,8 @@
 
 ## Summary
 
-- **Total Tests Created:** 39
-- **Tests Passing (without Docker):** 33 ✅
+- **Total Tests Created:** 51
+- **Tests Passing (without Docker):** 45 ✅
 - **Tests Requiring Docker:** 6 🐳
 
 ## Test Execution Results
@@ -14,31 +14,33 @@
 ```bash
 $ dotnet test tests/UrlShortener.Domain.Tests/ --verbosity minimal
 ```
-**Result:** ✅ **16 tests passed**
+**Result:** ✅ **17 tests passed**
 
 Tests:
-- ShortenUrl entity creation and validation (10 tests)
-- ShortenUrlTrack entity creation and tracking (6 tests)
+- ShortLink entity creation and validation (11 tests)
+- ShortLinkAccessLog entity creation and tracking (6 tests)
 
 #### Application Tests
 ```bash
 $ dotnet test tests/UrlShortener.Application.Tests/ --verbosity minimal
 ```
-**Result:** ✅ **8 tests passed**
+**Result:** ✅ **19 tests passed**
 
 Tests:
-- ShortenUrlAsync - URL shortening with code generation
-- ShortenUrlAsync - Code collision retry logic
-- ShortenUrlAsync - Null handling
+- CreateShortLinkAsync - URL shortening with code generation
+- CreateShortLinkAsync - Code collision retry logic
+- CreateShortLinkAsync - Null handling
+- CreateShortLinkAsync - Distributed lock scenarios
 - GetOriginalUrlAsync - Retrieve original URL with caching
 - GetOriginalUrlAsync - Handle expired URLs
 - GetOriginalUrlAsync - Handle non-existent codes
-- TrackUrlAccessAsync - Track URL access
-- TrackUrlAccessAsync - Handle tracking failures
+- TrackAccessAsync - Track URL access
+- TrackAccessAsync - Handle tracking failures
+- ShortLinkAnalyticsAppService - 5 analytics tests
 
 #### Infrastructure Store Tests
 ```bash
-$ dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortenUrlStoreTests" --verbosity minimal
+$ dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortLinkStoreTests" --verbosity minimal
 ```
 **Result:** ✅ **9 tests passed**
 
@@ -77,15 +79,15 @@ Tests:
 
 ## Running Tests
 
-### Quick Test (No Docker) - 33 Tests
+### Quick Test (No Docker) - 45 Tests
 ```bash
 # Run all unit tests
 dotnet test tests/UrlShortener.Domain.Tests/
 dotnet test tests/UrlShortener.Application.Tests/
-dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortenUrlStoreTests"
+dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortLinkStoreTests"
 ```
 
-### Full Test Suite (Docker Required) - 39 Tests
+### Full Test Suite (Docker Required) - 51 Tests
 ```bash
 # Ensure Docker is running
 docker ps
@@ -98,11 +100,11 @@ dotnet test
 
 | Layer | Tests | Status | Docker Required |
 |-------|-------|--------|----------------|
-| **Domain** | 16 | ✅ Passing | No |
-| **Application** | 8 | ✅ Passing | No |
+| **Domain** | 17 | ✅ Passing | No |
+| **Application** | 19 | ✅ Passing | No |
 | **Infrastructure - Store** | 9 | ✅ Passing | No |
 | **Infrastructure - Redis** | 6 | ✅ Passing | Yes 🐳 |
-| **Total** | **39** | **39 Passing** | |
+| **Total** | **51** | **51 Passing** | |
 
 ## Test Frameworks Used
 
@@ -120,10 +122,10 @@ Run unit tests only for quick feedback:
 ```bash
 dotnet test tests/UrlShortener.Domain.Tests/
 dotnet test tests/UrlShortener.Application.Tests/
-dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortenUrlStoreTests"
+dotnet test tests/UrlShortener.Infrastructure.Tests/ --filter "FullyQualifiedName~ShortLinkStoreTests"
 ```
 **Duration:** ~2-3 seconds
-**Tests:** 33
+**Tests:** 45
 
 ### Option 2: Full CI (With Docker)
 Run all tests including integration tests:
@@ -131,13 +133,13 @@ Run all tests including integration tests:
 dotnet test
 ```
 **Duration:** ~30-60 seconds (includes Docker container startup)
-**Tests:** 39
+**Tests:** 51
 
 Most modern CI/CD platforms (GitHub Actions, Azure DevOps, GitLab CI) support Docker and can run the full test suite.
 
 ## Next Steps
 
-1. ✅ 33 unit tests are working without Docker
+1. ✅ 45 unit tests are working without Docker
 2. ⚠️ 6 integration tests require Docker setup
 3. 📋 Consider adding performance/load tests
 4. 📋 Consider adding contract tests for distributed systems

@@ -1,6 +1,6 @@
 namespace UrlShortener.Host.Features.Shorten;
 
-public static class ShortenUrlEndpoints
+public static class ShortLinkEndpoints
 {
     
 }
